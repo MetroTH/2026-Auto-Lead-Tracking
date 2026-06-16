@@ -9,7 +9,7 @@
  *  3) ตั้งค่า Script Properties (Project Settings -> Script Properties):
  *        META_ACCESS_TOKEN = <System User Token สิทธิ์ ads_read>
  *        AD_ACCOUNT_ID     = 301660159574939
- *        SHEET_NAME        = ชื่อแท็บที่จะเขียน (เช่น Campaign_Monthly)
+ *        SHEET_NAME        = ชื่อแท็บที่จะเขียน (เช่น FBCampaignADS_Part)
  *  4) รันฟังก์ชัน runMonthly() ครั้งแรกเพื่อ authorize
  *  5) ตั้ง Trigger อัตโนมัติด้วย createDailyTrigger() (รันวันละครั้ง)
  */
@@ -21,7 +21,7 @@ function getConfig_() {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty('META_ACCESS_TOKEN');
   const adAccountId = props.getProperty('AD_ACCOUNT_ID');
-  const sheetName = props.getProperty('SHEET_NAME') || 'Campaign_Monthly';
+  const sheetName = props.getProperty('SHEET_NAME') || 'FBCampaignADS_Part';
   if (!token) throw new Error('ยังไม่ได้ตั้งค่า META_ACCESS_TOKEN ใน Script Properties');
   if (!adAccountId) throw new Error('ยังไม่ได้ตั้งค่า AD_ACCOUNT_ID ใน Script Properties');
   return { token: token, adAccountId: adAccountId, sheetName: sheetName };
@@ -33,6 +33,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('📊 Meta Ads')
     .addItem('🔄 ดึงเดือนนี้ (Monthly)', 'runMonthly')
+    .addItem('📅 ดึงทั้งปี (Year to Date)', 'runYearToDate')
     .addSeparator()
     .addItem('⏰ ตั้ง Trigger อัตโนมัติ 07:00', 'createDailyTrigger')
     .addItem('🗑️ ลบ Trigger ทั้งหมด', 'removeDailyTrigger')
@@ -41,7 +42,7 @@ function onOpen() {
 
 // ====== ENTRY POINTS ======
 
-/** ดึงข้อมูลเดือนปัจจุบัน (ตั้งแต่วันที่ 1 ถึงวันนี้) */
+/** ดึงเฉพาะเดือนปัจจุบัน (วันที่ 1 ถึงวันนี้) */
 function runMonthly() {
   const now = new Date();
   const tz = Session.getScriptTimeZone();
@@ -50,7 +51,16 @@ function runMonthly() {
   fetchAndWrite_(since, until);
 }
 
-/** ดึงข้อมูลตามช่วงวันที่กำหนดเอง เช่น runCustom('2026-01-01','2026-05-31') */
+/** ดึงตั้งแต่ 1 ม.ค. ของปีนี้จนถึงวันนี้ (Year to Date) */
+function runYearToDate() {
+  const now = new Date();
+  const tz = Session.getScriptTimeZone();
+  const since = Utilities.formatDate(new Date(now.getFullYear(), 0, 1), tz, 'yyyy-MM-dd');
+  const until = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+  fetchAndWrite_(since, until);
+}
+
+/** ดึงตามช่วงวันที่กำหนดเอง เช่น runCustom('2026-01-01','2026-06-16') */
 function runCustom(since, until) {
   fetchAndWrite_(since, until);
 }
@@ -61,7 +71,9 @@ function fetchAndWrite_(since, until) {
   const cfg = getConfig_();
   const rows = fetchInsights_(cfg, since, until);
   writeToSheet_(cfg.sheetName, rows);
-  Logger.log('เขียนข้อมูล %s แถว ช่วง %s ถึง %s', rows.length, since, until);
+  const msg = 'เขียนข้อมูล ' + rows.length + ' แถว (ช่วง ' + since + ' ถึง ' + until + ')';
+  Logger.log(msg);
+  SpreadsheetApp.getActive().toast(msg, 'Meta Ads', 5);
 }
 
 function fetchInsights_(cfg, since, until) {
@@ -85,6 +97,7 @@ function fetchInsights_(cfg, since, until) {
     level: 'campaign',
     fields: fields,
     time_range: JSON.stringify({ since: since, until: until }),
+    time_increment: 'monthly',
     limit: '500',
     access_token: cfg.token
   };
@@ -172,7 +185,6 @@ function createDailyTrigger() {
     .atHour(7)
     .create();
   SpreadsheetApp.getActive().toast('ตั้ง Trigger อัตโนมัติ 07:00 เรียบร้อย', 'Meta Ads', 4);
-  Logger.log('ตั้ง trigger รายวันเรียบร้อย (07:00)');
 }
 
 /** ลบ Trigger ของ runMonthly ทั้งหมด */
