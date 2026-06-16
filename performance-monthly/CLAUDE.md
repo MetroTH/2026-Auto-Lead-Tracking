@@ -1,5 +1,33 @@
 # CLAUDE.md — Performance Monthly
 
+## สถานะล่าสุด (อัปเดต 2026-06-16)
+
+### ✅ สิ่งที่ทำแล้ว
+- สร้าง `Code.gs` ครบทุกฟังก์ชัน (Mode 1 / Mode 2 / Trigger / onOpen)
+- แก้ไข Source B: ชื่อชีต `FBADS` อยู่ในไฟล์เดียวกับ Performance (ไม่ต้อง File ID แยก)
+- แก้ไข `parseDate_` รองรับ `dd/mm/yyyy` (Source A) และ `dd-MMM-yyyy`
+
+### 🔄 สถานะการทดสอบ
+- ชีต Performance ถูกสร้างพร้อม Header แล้ว ✅
+- ข้อมูลแถวยังไม่มี — รอทดสอบโค้ดเวอร์ชันใหม่ (หลัง fix FBADS) 🔄
+
+### ⚠️ สิ่งที่ต้องทำต่อ
+1. Copy `Code.gs` เวอร์ชันใหม่วางใน Apps Script → Save → Reload Sheet
+2. กดเมนู **📊 Performance → โหมด 1** เพื่อทดสอบ
+3. ตรวจสอบว่าคอลัมน์ L–O (MQL/Lead/QT/Sales) มีข้อมูลถูกต้อง
+4. หากคอลัมน์ L–O ยังว่าง ให้เช็ค format วันที่ใน Source A, D, E เพิ่มเติม
+
+### 🔑 File IDs ที่ยืนยันแล้ว
+| Source | File ID |
+|---|---|
+| A — Filter-raw-respond | `1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk` |
+| B — FBADS | อยู่ในไฟล์เดียวกับ Performance (Active SS) |
+| D — Quotation | `14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec` |
+| E — Invoice | `1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk` |
+| F — Performance | Active Spreadsheet `1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ` |
+
+---
+
 ## ภาพรวม
 
 Google Apps Script สำหรับดึงข้อมูลจาก 5 แหล่ง (A–E) รวมเป็น Dashboard Performance รายเดือน แยกตาม Campaign ลงใน Sheet F (Auto-Lead-Tracking-Performance)
