@@ -27,6 +27,18 @@ function getConfig_() {
   return { token: token, adAccountId: adAccountId, sheetName: sheetName };
 }
 
+// ====== MENU ======
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('📊 Meta Ads')
+    .addItem('🔄 ดึงเดือนนี้ (Monthly)', 'runMonthly')
+    .addSeparator()
+    .addItem('⏰ ตั้ง Trigger อัตโนมัติ 07:00', 'createDailyTrigger')
+    .addItem('🗑️ ลบ Trigger ทั้งหมด', 'removeDailyTrigger')
+    .addToUi();
+}
+
 // ====== ENTRY POINTS ======
 
 /** ดึงข้อมูลเดือนปัจจุบัน (ตั้งแต่วันที่ 1 ถึงวันนี้) */
@@ -151,14 +163,21 @@ function writeToSheet_(sheetName, rows) {
 
 // ====== TRIGGER ======
 
+/** ตั้งให้รัน runMonthly() อัตโนมัติทุกวัน เวลา 7 โมงเช้า */
 function createDailyTrigger() {
-  ScriptApp.getProjectTriggers().forEach(function (t) {
-    if (t.getHandlerFunction() === 'runMonthly') ScriptApp.deleteTrigger(t);
-  });
+  removeDailyTrigger();
   ScriptApp.newTrigger('runMonthly')
     .timeBased()
     .everyDays(1)
     .atHour(7)
     .create();
+  SpreadsheetApp.getActive().toast('ตั้ง Trigger อัตโนมัติ 07:00 เรียบร้อย', 'Meta Ads', 4);
   Logger.log('ตั้ง trigger รายวันเรียบร้อย (07:00)');
+}
+
+/** ลบ Trigger ของ runMonthly ทั้งหมด */
+function removeDailyTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'runMonthly') ScriptApp.deleteTrigger(t);
+  });
 }
