@@ -23,13 +23,13 @@
 var CONFIG = {
   // ===== Spreadsheet IDs (Source) =====
   SS_A_ID: '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk',   // DB_From_Respond_CRM
-  SS_B_ID: '',   // FBCampaignADS_Part — ใส่ File ID หรือตั้งใน Script Properties: PERF_B_SS_ID
+  SS_B_ID: '',   // FBADS — เว้นว่าง = อ่านจากไฟล์เดียวกับ Performance (Active Spreadsheet)
   SS_D_ID: '14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec',   // Quotation Detail-Bi
   SS_E_ID: '1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk',   // Invoicehead-Detail-Bi
 
   // ===== Sheet Names =====
   SHEET_A:   'Filter-raw-respond',
-  SHEET_B:   'FBCampaignADS_Part',   // ถ้าใช้ชื่อ Campaign_Monthly ให้แก้ที่นี่
+  SHEET_B:   'FBADS',   // แท็บข้อมูล Campaign รายเดือน (อยู่ในไฟล์เดียวกับ Performance)
   SHEET_D:   'Quotation',
   SHEET_E:   'Invoice',
   SHEET_OUT: 'Performance',          // ชีต Output ใน F
@@ -139,12 +139,10 @@ function buildPerformance_(opts) {
     var startDate = new Date(CONFIG.MODE1_START_YEAR, CONFIG.MODE1_START_MONTH - 1, 1);
     var currentMonthKey = getMonthKey_(now);
 
-    // โหลด B Spreadsheet ID จาก Script Properties ถ้า CONFIG ว่าง
-    var bSsId = CONFIG.SS_B_ID || PropertiesService.getScriptProperties().getProperty('PERF_B_SS_ID') || '';
-    if (!bSsId) {
-      notify_('⚠️ ยังไม่ได้ตั้งค่า', 'กรุณาตั้งค่า SS_B_ID ใน CONFIG หรือ Script Properties: PERF_B_SS_ID');
-      return { rows: 0, months: 0 };
-    }
+    // B (FBADS) อยู่ในไฟล์เดียวกับ Performance — ถ้าไม่กำหนด ใช้ Active Spreadsheet
+    var bSsId = CONFIG.SS_B_ID
+      || PropertiesService.getScriptProperties().getProperty('PERF_B_SS_ID')
+      || ss.getId();
 
     // โหลดข้อมูลจากทุก Source
     Logger.log('กำลังโหลดข้อมูลจาก Source A...');
@@ -540,6 +538,26 @@ function parseDate_(value) {
   }
   var s = String(value).trim();
   if (!s) return null;
+
+  // dd/mm/yyyy [hh:mm[:ss]] (รูปแบบของ Source A — Contact date)
+  var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+  if (m) {
+    var d1 = new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+    return isNaN(d1.getTime()) ? null : d1;
+  }
+
+  // dd-MMM-yyyy (เช่น 5-Jan-2026)
+  var m2 = s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
+  if (m2) {
+    var months = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5,
+                   jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 };
+    var mi = months[m2[2].toLowerCase()];
+    if (mi !== undefined) {
+      var d2 = new Date(+m2[3], mi, +m2[1]);
+      return isNaN(d2.getTime()) ? null : d2;
+    }
+  }
+
   var d = new Date(s);
   return isNaN(d.getTime()) ? null : d;
 }

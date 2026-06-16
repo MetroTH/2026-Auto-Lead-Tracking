@@ -25,19 +25,21 @@ Script นี้ต้อง deploy ใน Google Sheet ชื่อ **Auto-Lead
 | ชื่อ (สัญลักษณ์) | File ID | Sheet |
 |---|---|---|
 | DB_From_Respond_CRM (A) | `1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk` | Filter-raw-respond |
-| FBCampaignADS_Part (B) | **ต้องตั้งเอง** (ดูด้านล่าง) | FBCampaignADS_Part |
+| FBADS (B) | อยู่ในไฟล์เดียวกับ Performance | FBADS |
 | Quotation Detail-Bi (D) | `14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec` | Quotation |
 | Invoicehead-Detail-Bi (E) | `1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk` | Invoice |
 | Auto-Lead-Tracking-Performance (F) | Active Spreadsheet | Performance (output) |
 
 ---
 
-## ตั้งค่า File ID ของ B (FBCampaignADS_Part)
+## ตั้งค่า Source B (FBADS)
 
-เลือกอย่างใดอย่างหนึ่ง:
+โดยปกติ **ไม่ต้องตั้งค่าอะไร** เพราะแท็บ `FBADS` อยู่ในไฟล์เดียวกับ Performance
+Script จะอ่านจาก Active Spreadsheet ให้อัตโนมัติ
 
-1. **แก้ใน Code.gs**: เปลี่ยน `SS_B_ID: ''` → ใส่ File ID ของ FBCampaignADS_Part
-2. **Script Properties**: ไปที่ Project Settings → Script Properties → เพิ่ม `PERF_B_SS_ID` = File ID
+หาก FBADS ย้ายไปไฟล์อื่น ค่อยกำหนด File ID:
+1. **แก้ใน Code.gs**: ใส่ค่า `SS_B_ID`
+2. **Script Properties**: เพิ่ม `PERF_B_SS_ID` = File ID
 
 ---
 
