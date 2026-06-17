@@ -51,7 +51,7 @@ function onOpen() {
     .addItem('🔄 โหมด 1: Full Sync (ดึงทั้งหมดใหม่)', 'runFullSync')
     .addItem('➕ โหมด 2: Manual Sync (เพิ่มเฉพาะใหม่)', 'runManualSync')
     .addSeparator()
-    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 06:00', 'createDailyTrigger')
+    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:40', 'createDailyTrigger')
     .addItem('🗑️ ลบ Trigger ทั้งหมด', 'removeAllTriggers')
     .addToUi();
 }
