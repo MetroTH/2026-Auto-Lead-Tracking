@@ -2,7 +2,22 @@
 
 ## สถานะล่าสุด (อัปเดต 2026-06-17)
 
-### ✅ แก้ Format วันที่ (ล่าสุด)
+### ✅ ทดสอบผ่านแล้ว — ระบบพร้อมใช้งานจริง
+- ทดสอบรัน Mode 1 จริง ข้อมูลถูกต้องครบทุกคอลัมน์ (A–P) แยกตามเดือน + แถว Other ✅
+- Source B ดึงแบบรายเดือน (`time_increment: monthly`) แล้ว → Amount spent/Reach/ROAS
+  กระจายถูกต้องตามแต่ละเดือน ไม่กองรวมเดือนเดียว ✅
+- Format วันที่คอลัมน์ A (Jan-2026) และ C/D (yyyy-MM-dd) แสดงผลถูกต้องสม่ำเสมอ ✅
+
+### ⏰ เวลา Trigger ทั้งระบบ (เรียงให้ข้อมูลไหลทันในวันเดียว)
+| ลำดับ | Source | โปรเจกต์ | เวลา |
+|---|---|---|---|
+| 1 | A | db-from-respond-crm | 17:30 |
+| 2 | B | meta-ads-sheets | 17:40 |
+| 2 | D | leadcrm-google-sheet | 17:40 |
+| 2 | E | invoicehead-detail-bi | 17:40 |
+| 3 | F | performance-monthly | 18:00 (รันสุดท้าย) |
+
+### ✅ แก้ Format วันที่
 - คอลัมน์ A (Timestamp) และ C/D (Reporting starts/ends) ตั้ง `setNumberFormat('@')` (plain text)
   ก่อนเขียนค่า เพื่อกัน Google Sheets ตีความเป็นวันที่แล้วแสดงผลไม่ตรงกัน (เช่น "January-2026")
 - เพิ่ม `formatDateStr_()` แปลงค่า Reporting starts/ends จาก Source B ให้เป็น `yyyy-MM-dd`
@@ -31,11 +46,12 @@
 - โค้ดรองรับชื่อแท็บหลายแบบ: `FBCampaignADS_Part` / `FBADS` / `Campaign_Monthly`
   และเลือกแท็บที่ **มีข้อมูลจริง** (มากกว่า 1 แถว) อัตโนมัติ
 
-### ⚠️ สิ่งที่ต้องทำต่อ
-1. Copy `Code.gs` เวอร์ชันใหม่วางใน Apps Script → Save → Reload Sheet
-2. กดเมนู **📊 Performance → โหมด 1** เพื่อทดสอบ
-3. ตรวจสอบว่าคอลัมน์ L–O (MQL/Lead/QT/Sales) มีข้อมูลถูกต้อง
-4. หากคอลัมน์ L–O ยังว่าง ให้เช็ค format วันที่ใน Source A, D, E เพิ่มเติม
+### 🔁 การบำรุงรักษา / ข้อควรรู้
+1. ถ้าแก้โค้ด: Copy `Code.gs` วางใน Apps Script → Save → Reload Sheet → กดโหมด 1 ใหม่
+2. Source B ต้องเป็นข้อมูล**รายเดือน** (meta-ads-sheets ใช้ `time_increment: monthly`)
+   — ถ้าถอดออกจะรวมเป็นแถวเดียวทั้งช่วง ทำให้ Performance กองข้อมูลในเดือนเดียว
+3. ข้อมูลก่อน ม.ค. 2026 จะถูกกรองทิ้งอัตโนมัติ (เริ่มนับจาก `MODE1_START_YEAR/MONTH`)
+4. ROAS ว่าง = เดือนนั้นไม่มี Amount spent (B) หรือไม่มี Sales (E) ที่ match campaign
 
 ### 🔑 File IDs ที่ยืนยันแล้ว
 | Source | File ID |
@@ -44,7 +60,7 @@
 | B — FBCampaignADS_Part | `1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ` (ไฟล์แยก) |
 | D — Quotation | `14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec` |
 | E — Invoice | `1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk` |
-| F — Performance | Active Spreadsheet `1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ` |
+| F — Performance | Active Spreadsheet (ไฟล์ Auto-Lead-Tracking-Performance ที่ Script deploy อยู่) |
 
 ---
 
