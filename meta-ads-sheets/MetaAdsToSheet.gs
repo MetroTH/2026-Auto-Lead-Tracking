@@ -17,6 +17,41 @@
 // ====== CONFIG ======
 const GRAPH_VERSION = 'v23.0';
 
+// ====== MENU ======
+
+/** สร้าง custom menu เมื่อเปิด Sheet */
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('📈 Meta Ads')
+    .addItem('ดึงข้อมูลเดือนปัจจุบัน', 'runMonthly')
+    .addItem('ดึงข้อมูลตามช่วงวันที่...', 'runCustomPrompt')
+    .addSeparator()
+    .addItem('ตั้ง Trigger รายวัน 17:40', 'createDailyTrigger')
+    .addItem('ลบ Trigger รายวัน', 'removeDailyTrigger')
+    .addToUi();
+}
+
+/** ถามช่วงวันที่จากผู้ใช้ แล้วเรียก runCustom() */
+function runCustomPrompt() {
+  const ui = SpreadsheetApp.getUi();
+  const r1 = ui.prompt('ดึงข้อมูลตามช่วงวันที่', 'วันเริ่มต้น (yyyy-MM-dd):', ui.ButtonSet.OK_CANCEL);
+  if (r1.getSelectedButton() !== ui.Button.OK) return;
+  const since = r1.getResponseText().trim();
+
+  const r2 = ui.prompt('ดึงข้อมูลตามช่วงวันที่', 'วันสิ้นสุด (yyyy-MM-dd):', ui.ButtonSet.OK_CANCEL);
+  if (r2.getSelectedButton() !== ui.Button.OK) return;
+  const until = r2.getResponseText().trim();
+
+  const re = /^\d{4}-\d{2}-\d{2}$/;
+  if (!re.test(since) || !re.test(until)) {
+    ui.alert('รูปแบบวันที่ไม่ถูกต้อง', 'กรุณาใส่รูปแบบ yyyy-MM-dd เช่น 2026-05-01', ui.ButtonSet.OK);
+    return;
+  }
+
+  runCustom(since, until);
+  ui.alert('เสร็จสิ้น', 'ดึงข้อมูลช่วง ' + since + ' ถึง ' + until + ' เรียบร้อย', ui.ButtonSet.OK);
+}
+
 function getConfig_() {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty('META_ACCESS_TOKEN');
@@ -162,4 +197,11 @@ function createDailyTrigger() {
     .nearMinute(40)
     .create();
   Logger.log('ตั้ง trigger รายวันเรียบร้อย (17:40)');
+}
+
+function removeDailyTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'runMonthly') ScriptApp.deleteTrigger(t);
+  });
+  Logger.log('ลบ trigger รายวันเรียบร้อย');
 }

@@ -20,9 +20,20 @@ Amount spent (THB)-FB | Reach | Result type | Results |
 Messaging conversations started | Clicks (all) | CTR (all) | CPC (all)
 
 ## หมายเหตุการทำงาน
+- `onOpen()` — สร้าง custom menu **📈 Meta Ads** เมื่อเปิด Sheet
 - `runMonthly()` — ดึงเดือนปัจจุบัน (วันที่ 1 ถึงวันนี้)
 - `runCustom(since, until)` — ดึงตามช่วงวันที่ (รูปแบบ yyyy-MM-dd)
+- `runCustomPrompt()` — เมนูถามช่วงวันที่จากผู้ใช้แล้วเรียก `runCustom()`
 - `createDailyTrigger()` — ตั้ง trigger รันทุกวัน 17:40
+- `removeDailyTrigger()` — ลบ trigger รายวัน
+
+## เมนู 📈 Meta Ads
+| รายการ | ฟังก์ชัน |
+|---|---|
+| ดึงข้อมูลเดือนปัจจุบัน | `runMonthly()` |
+| ดึงข้อมูลตามช่วงวันที่... | `runCustomPrompt()` |
+| ตั้ง Trigger รายวัน 17:40 | `createDailyTrigger()` |
+| ลบ Trigger รายวัน | `removeDailyTrigger()` |
 - คอลัมน์ "Result type" ปัจจุบันเว้นว่าง (ยังไม่ map ตาม objective)
 - Campaign ID นำหน้าด้วย ' กัน Sheet แปลงเป็น scientific notation
 
