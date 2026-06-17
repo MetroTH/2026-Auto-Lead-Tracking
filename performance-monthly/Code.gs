@@ -162,8 +162,8 @@ function buildPerformance_(opts) {
     // สร้าง Raw maps จาก A, D, E
     // rawCountMap[monthKey][campaignName] = count (respond_id)
     // rawSumMap[monthKey][campaignName] = sum (value/sales)
-    var mqlRaw   = buildRawCountMap_(dataA, CONFIG.A_CONTACT_DATE, CONFIG.A_CAMPAIGN_NAME, startDate, now);
-    var leadRaw  = buildRawCountMap_(dataD, CONFIG.D_DATE, CONFIG.D_CAMPAIGN_NAME, startDate, now);
+    var mqlRaw   = buildRawCountMap_(dataA, CONFIG.A_CONTACT_DATE, CONFIG.A_CAMPAIGN_NAME, CONFIG.A_RESPOND_ID, startDate, now);
+    var leadRaw  = buildRawCountMap_(dataD, CONFIG.D_DATE, CONFIG.D_CAMPAIGN_NAME, CONFIG.D_RESPOND_ID, startDate, now);
     var qtRaw    = buildRawSumMap_(dataD, CONFIG.D_DATE, CONFIG.D_CAMPAIGN_NAME, CONFIG.D_VALUE, startDate, now);
     var salesRaw = buildRawSumMap_(dataE, CONFIG.E_DATE, CONFIG.E_CAMPAIGN_NAME, CONFIG.E_TOTAL_SALES, startDate, now);
 
@@ -367,11 +367,15 @@ function buildBMap_(dataB, startDate, now) {
 /* ===================== RAW COUNT / SUM MAP BUILDERS ===================== */
 
 /**
- * นับ respond_id จากข้อมูล Source
- * return: rawCountMap[monthKey][campaignName] = count
+ * นับ respond_id แบบไม่ซ้ำ (distinct) จากข้อมูล Source
+ * - ข้ามแถวที่ไม่มี respond_id
+ * - respond_id เดียวกันใน month+campaign เดียวกัน นับครั้งเดียว
+ *   (Source D มีหลายแถวต่อ 1 respond_id เพราะแยกตาม Part No)
+ * return: rawCountMap[monthKey][campaignName] = count (distinct respond_id)
  */
-function buildRawCountMap_(data, dateColIdx, campColIdx, startDate, now) {
+function buildRawCountMap_(data, dateColIdx, campColIdx, respondIdColIdx, startDate, now) {
   var map = {};
+  var seen = {};   // seen[mk][camp][respondId] = true
   if (!data || data.length < 2) return map;
 
   for (var r = 1; r < data.length; r++) {
@@ -379,8 +383,16 @@ function buildRawCountMap_(data, dateColIdx, campColIdx, startDate, now) {
     var date = parseDate_(row[dateColIdx]);
     if (!date || date < startDate || date > now) continue;
 
+    var rid = trimStr_(row[respondIdColIdx]);
+    if (!rid) continue;   // ต้องมี respond_id เท่านั้น
+
     var mk   = getMonthKey_(date);
     var camp = trimStr_(row[campColIdx]) || '';
+
+    if (!seen[mk]) seen[mk] = {};
+    if (!seen[mk][camp]) seen[mk][camp] = {};
+    if (seen[mk][camp][rid]) continue;   // นับ respond_id ไม่ซ้ำ
+    seen[mk][camp][rid] = true;
 
     if (!map[mk]) map[mk] = {};
     map[mk][camp] = (map[mk][camp] || 0) + 1;

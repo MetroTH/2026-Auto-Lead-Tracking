@@ -9,7 +9,11 @@
 
 ### 🔄 สถานะการทดสอบ
 - รัน Mode 1 ได้ข้อมูลครบ (May/June 2026 + แถว Other ต่อเดือน) ✅
-- MQL/Lead/QT/Sales matching ทำงานถูกต้องตามตัวอย่าง ✅
+- ตรวจ Column Index ทุก Source (A/B/D/E) ตรงกับ schema จริง ✅
+- แก้ MQL(L)/Lead(M) ให้นับ respond_id แบบ distinct + ข้ามแถวไม่มี respond_id ✅
+  (เดิมนับทุกแถว → Lead เกินจริงเพราะ D มีหลายแถวต่อ 1 respond_id ตาม Part No)
+- QT(N)/Sales(O) = ผลรวมทุกแถว (ถูกต้อง เพราะรวมทุก Part/รายการ) ✅
+- ROAS(P) = Sales/Amount Spent ต่อ Campaign, ถ้า spend=0/ว่าง → ปล่อยว่าง ✅
 
 ### 📌 หมายเหตุ Source B
 - ข้อมูล Campaign (Source B) อยู่ใน**แท็บภายในไฟล์ Performance เอง** (Active Spreadsheet)
