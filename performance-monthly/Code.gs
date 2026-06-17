@@ -23,7 +23,7 @@
 var CONFIG = {
   // ===== Spreadsheet IDs (Source) =====
   SS_A_ID: '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk',   // DB_From_Respond_CRM
-  SS_B_ID: '',   // FBADS — เว้นว่าง = อ่านจากไฟล์เดียวกับ Performance (Active Spreadsheet)
+  SS_B_ID: '1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ',   // FBCampaignADS_Part (ไฟล์แยกต่างหาก)
   SS_D_ID: '14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec',   // Quotation Detail-Bi
   SS_E_ID: '1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk',   // Invoicehead-Detail-Bi
 
@@ -287,15 +287,18 @@ function buildPerformance_(opts) {
 
 function loadSheet_(ssId, sheetName) {
   var ss = SpreadsheetApp.openById(ssId);
-  // รองรับชื่อชีตแบบ array → ใช้ตัวแรกที่เจอ
+  // รองรับชื่อชีตแบบ array → เลือกแท็บแรกที่ "มีข้อมูลจริง" (มากกว่า 1 แถว)
+  // ถ้าไม่มีตัวไหนมีข้อมูล ใช้ตัวแรกที่เจอชื่อ
   var names = Array.isArray(sheetName) ? sheetName : [sheetName];
-  var sh = null;
+  var firstFound = null;
   for (var i = 0; i < names.length; i++) {
-    sh = ss.getSheetByName(names[i]);
-    if (sh) break;
+    var s = ss.getSheetByName(names[i]);
+    if (!s) continue;
+    if (!firstFound) firstFound = s;
+    if (s.getLastRow() > 1) return s.getDataRange().getValues();   // มีข้อมูล → ใช้เลย
   }
-  if (!sh) throw new Error('ไม่พบชีต "' + names.join('" / "') + '" ใน Spreadsheet ID: ' + ssId);
-  return sh.getDataRange().getValues();
+  if (firstFound) return firstFound.getDataRange().getValues();
+  throw new Error('ไม่พบชีต "' + names.join('" / "') + '" ใน Spreadsheet ID: ' + ssId);
 }
 
 /* ===================== B MAP BUILDER ===================== */

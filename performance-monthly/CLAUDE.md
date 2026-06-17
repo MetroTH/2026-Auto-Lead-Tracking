@@ -15,11 +15,12 @@
 - QT(N)/Sales(O) = ผลรวมทุกแถว (ถูกต้อง เพราะรวมทุก Part/รายการ) ✅
 - ROAS(P) = Sales/Amount Spent ต่อ Campaign, ถ้า spend=0/ว่าง → ปล่อยว่าง ✅
 
-### 📌 หมายเหตุ Source B
-- ข้อมูล Campaign (Source B) อยู่ใน**แท็บภายในไฟล์ Performance เอง** (Active Spreadsheet)
-- ชื่อแท็บที่ถูกต้องคือ `FBCampaignADS_Part` (เดิมทดสอบด้วยชื่อ `FBADS`)
-- โค้ดรองรับชื่อแท็บหลายแบบอัตโนมัติ: `FBCampaignADS_Part` / `FBADS` / `Campaign_Monthly`
-  → rename แท็บเป็นชื่อไหนในรายการนี้ก็ทำงานได้ ไม่ต้องแก้โค้ด
+### 📌 หมายเหตุ Source B (สำคัญ!)
+- Source B = ไฟล์ **FBCampaignADS_Part แยกต่างหาก** File ID `1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ`
+  (ไม่ใช่ไฟล์เดียวกับ Performance! แท็บ FBADS ในไฟล์ Performance เป็นสำเนาเก่า/ว่าง)
+- ตั้งค่าแล้วใน `SS_B_ID`
+- โค้ดรองรับชื่อแท็บหลายแบบ: `FBCampaignADS_Part` / `FBADS` / `Campaign_Monthly`
+  และเลือกแท็บที่ **มีข้อมูลจริง** (มากกว่า 1 แถว) อัตโนมัติ
 
 ### ⚠️ สิ่งที่ต้องทำต่อ
 1. Copy `Code.gs` เวอร์ชันใหม่วางใน Apps Script → Save → Reload Sheet
@@ -31,7 +32,7 @@
 | Source | File ID |
 |---|---|
 | A — Filter-raw-respond | `1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk` |
-| B — FBADS | อยู่ในไฟล์เดียวกับ Performance (Active SS) |
+| B — FBCampaignADS_Part | `1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ` (ไฟล์แยก) |
 | D — Quotation | `14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec` |
 | E — Invoice | `1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk` |
 | F — Performance | Active Spreadsheet `1-wZGx8GkBbnF24cC9TLOzIbZ0vhoPVxe8E_NohIzWfQ` |
