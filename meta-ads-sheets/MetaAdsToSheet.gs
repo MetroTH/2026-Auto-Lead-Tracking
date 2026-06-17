@@ -197,6 +197,7 @@ function createDailyTrigger() {
     .nearMinute(40)
     .create();
   Logger.log('ตั้ง trigger รายวันเรียบร้อย (17:40)');
+  showToast_('ตั้ง Trigger อัตโนมัติ 17:40 น. เรียบร้อยแล้ว');
 }
 
 function removeDailyTrigger() {
@@ -204,4 +205,11 @@ function removeDailyTrigger() {
     if (t.getHandlerFunction() === 'runMonthly') ScriptApp.deleteTrigger(t);
   });
   Logger.log('ลบ trigger รายวันเรียบร้อย');
+  showToast_('ลบ Trigger รายวันเรียบร้อยแล้ว');
+}
+
+function showToast_(msg) {
+  try {
+    SpreadsheetApp.getActiveSpreadsheet().toast(msg, 'Meta Ads', 6);
+  } catch (e) { /* ไม่มี UI (เช่นรันจาก trigger) */ }
 }
