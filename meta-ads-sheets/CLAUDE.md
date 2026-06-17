@@ -21,16 +21,20 @@ Messaging conversations started | Clicks (all) | CTR (all) | CPC (all)
 
 ## หมายเหตุการทำงาน
 - `onOpen()` — สร้าง custom menu **📈 Meta Ads** เมื่อเปิด Sheet
-- `runMonthly()` — ดึงเดือนปัจจุบัน (วันที่ 1 ถึงวันนี้)
+- `runMonthly()` — ดึงข้อมูล**รายเดือน**ตั้งแต่ `HISTORY_START` (2026-01-01) ถึงวันนี้
+  แล้วเขียนทับชีตด้วยข้อมูลครบทุกเดือน (ใช้เป็นรอบหลัก/ตั้ง Trigger)
 - `runCustom(since, until)` — ดึงตามช่วงวันที่ (รูปแบบ yyyy-MM-dd)
 - `runCustomPrompt()` — เมนูถามช่วงวันที่จากผู้ใช้แล้วเรียก `runCustom()`
 - `createDailyTrigger()` — ตั้ง trigger รันทุกวัน 17:40
 - `removeDailyTrigger()` — ลบ trigger รายวัน
+- **สำคัญ**: ใช้ `time_increment: 'monthly'` ใน API → Meta คืน 1 แถวต่อแคมเปญต่อเดือน
+  (Reporting starts/ends เป็นช่วงของแต่ละเดือน) เพื่อให้ `performance-monthly`
+  จัดกลุ่มตามเดือนได้ถูกต้อง — ห้ามถอดออก ไม่งั้นจะรวมเป็นแถวเดียวทั้งช่วง
 
 ## เมนู 📈 Meta Ads
 | รายการ | ฟังก์ชัน |
 |---|---|
-| ดึงข้อมูลเดือนปัจจุบัน | `runMonthly()` |
+| ดึงข้อมูลรายเดือน (ตั้งแต่ ม.ค.) | `runMonthly()` |
 | ดึงข้อมูลตามช่วงวันที่... | `runCustomPrompt()` |
 | ตั้ง Trigger รายวัน 17:40 | `createDailyTrigger()` |
 | ลบ Trigger รายวัน | `removeDailyTrigger()` |

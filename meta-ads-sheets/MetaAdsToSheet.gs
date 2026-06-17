@@ -16,6 +16,7 @@
 
 // ====== CONFIG ======
 const GRAPH_VERSION = 'v23.0';
+const HISTORY_START = '2026-01-01';   // วันเริ่มต้นของข้อมูลรายเดือน (ดึงตั้งแต่ ม.ค. 2026)
 
 // ====== MENU ======
 
@@ -23,7 +24,7 @@ const GRAPH_VERSION = 'v23.0';
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('📈 Meta Ads')
-    .addItem('ดึงข้อมูลเดือนปัจจุบัน', 'runMonthly')
+    .addItem('ดึงข้อมูลรายเดือน (ตั้งแต่ ม.ค.)', 'runMonthly')
     .addItem('ดึงข้อมูลตามช่วงวันที่...', 'runCustomPrompt')
     .addSeparator()
     .addItem('ตั้ง Trigger รายวัน 17:40', 'createDailyTrigger')
@@ -64,13 +65,14 @@ function getConfig_() {
 
 // ====== ENTRY POINTS ======
 
-/** ดึงข้อมูลเดือนปัจจุบัน (ตั้งแต่วันที่ 1 ถึงวันนี้) */
+/**
+ * ดึงข้อมูลรายเดือนทั้งหมด ตั้งแต่ HISTORY_START ถึงวันนี้
+ * (เขียนทับชีตด้วยข้อมูลครบทุกเดือน — ใช้เป็นรอบหลัก/ตั้ง Trigger)
+ */
 function runMonthly() {
-  const now = new Date();
   const tz = Session.getScriptTimeZone();
-  const since = Utilities.formatDate(new Date(now.getFullYear(), now.getMonth(), 1), tz, 'yyyy-MM-dd');
-  const until = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
-  fetchAndWrite_(since, until);
+  const until = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+  fetchAndWrite_(HISTORY_START, until);
 }
 
 /** ดึงข้อมูลตามช่วงวันที่กำหนดเอง เช่น runCustom('2026-01-01','2026-05-31') */
@@ -108,6 +110,7 @@ function fetchInsights_(cfg, since, until) {
     level: 'campaign',
     fields: fields,
     time_range: JSON.stringify({ since: since, until: until }),
+    time_increment: 'monthly',   // แตกผลลัพธ์เป็นรายเดือน (1 แถวต่อแคมเปญต่อเดือน)
     limit: '500',
     access_token: cfg.token
   };
