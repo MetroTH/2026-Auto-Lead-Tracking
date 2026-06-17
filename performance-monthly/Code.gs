@@ -29,7 +29,9 @@ var CONFIG = {
 
   // ===== Sheet Names =====
   SHEET_A:   'Filter-raw-respond',
-  SHEET_B:   'FBADS',   // แท็บข้อมูล Campaign รายเดือน (อยู่ในไฟล์เดียวกับ Performance)
+  // แท็บข้อมูล Campaign รายเดือน (อยู่ในไฟล์เดียวกับ Performance)
+  // ใส่ได้หลายชื่อ — โค้ดจะใช้ตัวแรกที่เจอ (ตั้งชื่อแท็บแบบไหนก็ได้)
+  SHEET_B:   ['FBCampaignADS_Part', 'FBADS', 'Campaign_Monthly'],
   SHEET_D:   'Quotation',
   SHEET_E:   'Invoice',
   SHEET_OUT: 'Performance',          // ชีต Output ใน F
@@ -148,7 +150,7 @@ function buildPerformance_(opts) {
     Logger.log('กำลังโหลดข้อมูลจาก Source A...');
     var dataA = loadSheet_(CONFIG.SS_A_ID, CONFIG.SHEET_A);
     Logger.log('กำลังโหลดข้อมูลจาก Source B...');
-    var dataB = loadSheet_(bSsId, CONFIG.SHEET_B);
+    var dataB = loadSheet_(bSsId, CONFIG.SHEET_B);   // SHEET_B = array → ใช้ตัวแรกที่เจอ
     Logger.log('กำลังโหลดข้อมูลจาก Source D...');
     var dataD = loadSheet_(CONFIG.SS_D_ID, CONFIG.SHEET_D);
     Logger.log('กำลังโหลดข้อมูลจาก Source E...');
@@ -285,10 +287,15 @@ function buildPerformance_(opts) {
 
 function loadSheet_(ssId, sheetName) {
   var ss = SpreadsheetApp.openById(ssId);
-  var sh = ss.getSheetByName(sheetName);
-  if (!sh) throw new Error('ไม่พบชีต "' + sheetName + '" ใน Spreadsheet ID: ' + ssId);
-  var data = sh.getDataRange().getValues();
-  return data;
+  // รองรับชื่อชีตแบบ array → ใช้ตัวแรกที่เจอ
+  var names = Array.isArray(sheetName) ? sheetName : [sheetName];
+  var sh = null;
+  for (var i = 0; i < names.length; i++) {
+    sh = ss.getSheetByName(names[i]);
+    if (sh) break;
+  }
+  if (!sh) throw new Error('ไม่พบชีต "' + names.join('" / "') + '" ใน Spreadsheet ID: ' + ssId);
+  return sh.getDataRange().getValues();
 }
 
 /* ===================== B MAP BUILDER ===================== */

@@ -8,8 +8,14 @@
 - แก้ไข `parseDate_` รองรับ `dd/mm/yyyy` (Source A) และ `dd-MMM-yyyy`
 
 ### 🔄 สถานะการทดสอบ
-- ชีต Performance ถูกสร้างพร้อม Header แล้ว ✅
-- ข้อมูลแถวยังไม่มี — รอทดสอบโค้ดเวอร์ชันใหม่ (หลัง fix FBADS) 🔄
+- รัน Mode 1 ได้ข้อมูลครบ (May/June 2026 + แถว Other ต่อเดือน) ✅
+- MQL/Lead/QT/Sales matching ทำงานถูกต้องตามตัวอย่าง ✅
+
+### 📌 หมายเหตุ Source B
+- ข้อมูล Campaign (Source B) อยู่ใน**แท็บภายในไฟล์ Performance เอง** (Active Spreadsheet)
+- ชื่อแท็บที่ถูกต้องคือ `FBCampaignADS_Part` (เดิมทดสอบด้วยชื่อ `FBADS`)
+- โค้ดรองรับชื่อแท็บหลายแบบอัตโนมัติ: `FBCampaignADS_Part` / `FBADS` / `Campaign_Monthly`
+  → rename แท็บเป็นชื่อไหนในรายการนี้ก็ทำงานได้ ไม่ต้องแก้โค้ด
 
 ### ⚠️ สิ่งที่ต้องทำต่อ
 1. Copy `Code.gs` เวอร์ชันใหม่วางใน Apps Script → Save → Reload Sheet
