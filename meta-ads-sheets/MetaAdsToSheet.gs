@@ -158,8 +158,8 @@ function createDailyTrigger() {
   ScriptApp.newTrigger('runMonthly')
     .timeBased()
     .everyDays(1)
-    .atHour(23)
-    .nearMinute(55)
+    .atHour(17)
+    .nearMinute(40)
     .create();
-  Logger.log('ตั้ง trigger รายวันเรียบร้อย (23:55)');
+  Logger.log('ตั้ง trigger รายวันเรียบร้อย (17:40)');
 }

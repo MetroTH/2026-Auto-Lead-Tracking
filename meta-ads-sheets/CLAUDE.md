@@ -22,7 +22,7 @@ Messaging conversations started | Clicks (all) | CTR (all) | CPC (all)
 ## หมายเหตุการทำงาน
 - `runMonthly()` — ดึงเดือนปัจจุบัน (วันที่ 1 ถึงวันนี้)
 - `runCustom(since, until)` — ดึงตามช่วงวันที่ (รูปแบบ yyyy-MM-dd)
-- `createDailyTrigger()` — ตั้ง trigger รันทุกวัน 23:55
+- `createDailyTrigger()` — ตั้ง trigger รันทุกวัน 17:40
 - คอลัมน์ "Result type" ปัจจุบันเว้นว่าง (ยังไม่ map ตาม objective)
 - Campaign ID นำหน้าด้วย ' กัน Sheet แปลงเป็น scientific notation
 
