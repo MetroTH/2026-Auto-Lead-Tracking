@@ -344,15 +344,15 @@ function buildBMap_(dataB, startDate, now) {
         var newEnd = parseDate_(row[CONFIG.B_REPORTING_END]);
         var existEnd = parseDate_(existing.ends);
         if (newEnd && existEnd && newEnd > existEnd) {
-          existing.ends = trimStr_(row[CONFIG.B_REPORTING_END]);
+          existing.ends = formatDateStr_(row[CONFIG.B_REPORTING_END]);
           existing.ctr  = toNum_(row[CONFIG.B_CTR]);
           existing.cpc  = toNum_(row[CONFIG.B_CPC]);
         }
       }
     } else {
       bMap[mk][campName] = {
-        starts:  trimStr_(row[CONFIG.B_REPORTING_START]),
-        ends:    trimStr_(row[CONFIG.B_REPORTING_END]),
+        starts:  formatDateStr_(row[CONFIG.B_REPORTING_START]),
+        ends:    formatDateStr_(row[CONFIG.B_REPORTING_END]),
         spend:   toNum_(row[CONFIG.B_AMOUNT_SPENT]),
         reach:   toNum_(row[CONFIG.B_REACH]),
         results: toNum_(row[CONFIG.B_RESULTS]),
@@ -462,6 +462,9 @@ function writeOutputFull_(outSheet, outputRows) {
   outSheet.getRange(1, 1, 1, OUTPUT_HEADER.length).setValues([OUTPUT_HEADER]).setFontWeight('bold');
   outSheet.setFrozenRows(1);
   if (outputRows.length === 0) return;
+  // กันไม่ให้ Sheets ตีความ Timestamp/Reporting starts/ends เป็นวันที่แล้วแสดงผลผิดรูปแบบ
+  outSheet.getRange(2, 1, outputRows.length, 1).setNumberFormat('@');
+  outSheet.getRange(2, 3, outputRows.length, 2).setNumberFormat('@');
   outSheet.getRange(2, 1, outputRows.length, OUTPUT_HEADER.length).setValues(outputRows);
   // Format ROAS column P (index 15) as number 2 decimal
   outSheet.getRange(2, 16, outputRows.length, 1).setNumberFormat('0.00');
@@ -477,6 +480,8 @@ function appendOutput_(outSheet, outputRows) {
     lastRow = 1;
   }
   var startRow = lastRow + 1;
+  outSheet.getRange(startRow, 1, outputRows.length, 1).setNumberFormat('@');
+  outSheet.getRange(startRow, 3, outputRows.length, 2).setNumberFormat('@');
   outSheet.getRange(startRow, 1, outputRows.length, OUTPUT_HEADER.length).setValues(outputRows);
   outSheet.getRange(startRow, 16, outputRows.length, 1).setNumberFormat('0.00');
 }
@@ -600,6 +605,13 @@ function numAdd_(existing, newVal) {
 function trimStr_(v) {
   if (v === null || v === undefined) return '';
   return String(v).trim();
+}
+
+/** แปลงค่าวันที่ (Date object หรือ string) เป็น 'yyyy-MM-dd' ไม่มีเวลา */
+function formatDateStr_(v) {
+  var d = parseDate_(v);
+  if (d) return Utilities.formatDate(d, CONFIG.TIMEZONE, 'yyyy-MM-dd');
+  return trimStr_(v);
 }
 
 function notify_(title, msg) {

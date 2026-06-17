@@ -1,6 +1,15 @@
 # CLAUDE.md — Performance Monthly
 
-## สถานะล่าสุด (อัปเดต 2026-06-16)
+## สถานะล่าสุด (อัปเดต 2026-06-17)
+
+### ✅ แก้ Format วันที่ (ล่าสุด)
+- คอลัมน์ A (Timestamp) และ C/D (Reporting starts/ends) ตั้ง `setNumberFormat('@')` (plain text)
+  ก่อนเขียนค่า เพื่อกัน Google Sheets ตีความเป็นวันที่แล้วแสดงผลไม่ตรงกัน (เช่น "January-2026")
+- เพิ่ม `formatDateStr_()` แปลงค่า Reporting starts/ends จาก Source B ให้เป็น `yyyy-MM-dd`
+  เสมอ (เดิมใช้ `trimStr_` ซึ่งถ้าค่าเป็น Date object จะได้ string เวลาเต็มแบบ
+  "Thu Jan 01 2026 15:00:00")
+
+## สถานะก่อนหน้า (2026-06-16)
 
 ### ✅ สิ่งที่ทำแล้ว
 - สร้าง `Code.gs` ครบทุกฟังก์ชัน (Mode 1 / Mode 2 / Trigger / onOpen)
