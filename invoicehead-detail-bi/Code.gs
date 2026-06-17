@@ -328,10 +328,11 @@ function createDailyTrigger() {
   ScriptApp.newTrigger('syncInvoice')
     .timeBased()
     .everyDays(1)
-    .atHour(6)
+    .atHour(17)
+    .nearMinute(40)
     .create();
-  Logger.log('ตั้ง trigger รายวัน 06:00 เรียบร้อย');
-  showToast_('ตั้ง Trigger อัตโนมัติ 06:00 น. เรียบร้อยแล้ว');
+  Logger.log('ตั้ง trigger รายวัน 17:40 เรียบร้อย');
+  showToast_('ตั้ง Trigger อัตโนมัติ 17:40 น. เรียบร้อยแล้ว');
 }
 
 function removeAllTriggers() {

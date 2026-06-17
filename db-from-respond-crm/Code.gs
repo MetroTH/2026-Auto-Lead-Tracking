@@ -23,7 +23,8 @@ const CONFIG = {
   TIMEZONE: 'Asia/Bangkok',
   // โหมด 1 : null = ไม่จำกัดวันเริ่มต้น (ดึงข้อมูลทั้งหมดจาก DB01)
   MODE1_START_DATE: null,
-  TRIGGER_HOUR: 18,              // 18:00 น.
+  TRIGGER_HOUR: 17,              // 17:30 น.
+  TRIGGER_MINUTE: 30,
 
   // คอลัมน์ที่ใช้เป็น "respond_id" (คีย์ dedup) และ "Task_ID" (คีย์เวลา/เรียงลำดับ)
   KEY_RESPOND_ID: 'respond_id',
@@ -93,7 +94,7 @@ function onOpen() {
     .addItem('โหมด 1: ดึงทั้งหมด (ทุกช่วงเวลา)', 'runMode1_Full')
     .addItem('โหมด 2: ดึงเพิ่ม (Manual incremental)', 'runMode2_Incremental')
     .addSeparator()
-    .addItem('ตั้ง Trigger รายวัน 18:00', 'installDailyTrigger')
+    .addItem('ตั้ง Trigger รายวัน 17:30', 'installDailyTrigger')
     .addItem('ลบ Trigger รายวัน', 'removeDailyTrigger')
     .addToUi();
 }
@@ -362,9 +363,10 @@ function installDailyTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(CONFIG.TRIGGER_HOUR)
+    .nearMinute(CONFIG.TRIGGER_MINUTE)
     .inTimezone(CONFIG.TIMEZONE)
     .create();
-  notify_('ตั้ง Trigger สำเร็จ', 'ดึงข้อมูลทุกวัน เวลา ' + CONFIG.TRIGGER_HOUR + ':00 (' + CONFIG.TIMEZONE + ')');
+  notify_('ตั้ง Trigger สำเร็จ', 'ดึงข้อมูลทุกวัน เวลา ' + CONFIG.TRIGGER_HOUR + ':' + CONFIG.TRIGGER_MINUTE + ' (' + CONFIG.TIMEZONE + ')');
 }
 
 function removeDailyTrigger() {

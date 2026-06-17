@@ -84,7 +84,7 @@ A=Date, B=Invoice No, C=CustNo, D=CustomerName, E=Total Sales, F=Channel, G=Regi
 |---|---|---|
 | 1 | `runFullSync()` | ลบทั้งหมด sync ใหม่ |
 | 2 | `runManualSync()` | เพิ่มเฉพาะแถวใหม่ |
-| 3 (Trigger) | `syncInvoice()` | อัตโนมัติทุกวัน 06:00 Asia/Bangkok |
+| 3 (Trigger) | `syncInvoice()` | อัตโนมัติทุกวัน 17:40 Asia/Bangkok |
 
 ---
 
