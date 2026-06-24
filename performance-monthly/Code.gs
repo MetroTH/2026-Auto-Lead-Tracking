@@ -167,6 +167,11 @@ function buildPerformance_(opts) {
     var qtRaw    = buildRawSumMap_(dataD, CONFIG.D_DATE, CONFIG.D_CAMPAIGN_NAME, CONFIG.D_VALUE, startDate, now);
     var salesRaw = buildRawSumMap_(dataE, CONFIG.E_DATE, CONFIG.E_CAMPAIGN_NAME, CONFIG.E_TOTAL_SALES, startDate, now);
 
+    // นับ respond_id แบบไม่ซ้ำ "ระดับทั้งเดือน" (ไม่แยก campaign) — ใช้สำหรับแถว All Campaign
+    // ต้องนับแยกต่างหาก เพราะ respond_id เดียวกันอาจอยู่หลาย campaign ถ้าเอาแต่ละ campaign มาบวกจะเกินจริง
+    var mqlMonthDistinct  = buildMonthDistinctMap_(dataA, CONFIG.A_CONTACT_DATE, CONFIG.A_RESPOND_ID, startDate, now);
+    var leadMonthDistinct = buildMonthDistinctMap_(dataD, CONFIG.D_DATE, CONFIG.D_RESPOND_ID, startDate, now);
+
     // รวบรวม Month Keys ทั้งหมดจากทุก Source
     var allMonthSet = {};
     [mqlRaw, leadRaw, qtRaw, salesRaw].forEach(function(rawMap) {
@@ -263,6 +268,41 @@ function buildPerformance_(opts) {
         otherQt,
         otherSales,
         ''
+      ]);
+
+      // Row "All Campaign" — ยอดรวมทั้งเดือน (ทุก Campaign + Other)
+      // E,F,G,H,I,N,O = ผลรวม (sum) | L(MQL),M(Lead) = นับ distinct ระดับทั้งเดือน
+      // J(CTR),K(CPC) = เว้นว่าง (เป็นอัตราส่วน รวมกันไม่ได้)
+      var allSpend   = sumBField_(bMonthData, 'spend');
+      var allReach   = sumBField_(bMonthData, 'reach');
+      var allResults = sumBField_(bMonthData, 'results');
+      var allMsgConv = sumBField_(bMonthData, 'msgConv');
+      var allClicks  = sumBField_(bMonthData, 'clicks');
+      var allMql     = mqlMonthDistinct[mk]  !== undefined ? mqlMonthDistinct[mk]  : '';
+      var allLead    = leadMonthDistinct[mk] !== undefined ? leadMonthDistinct[mk] : '';
+      var allQt      = sumMapValues_(qtRaw[mk]);
+      var allSales   = sumMapValues_(salesRaw[mk]);
+      var allRoas    = (allSales !== '' && allSpend !== '' && allSpend !== 0)
+        ? Math.round((allSales / allSpend) * 100) / 100
+        : '';
+
+      outputRows.push([
+        monthLabel,
+        'All Campaign',
+        otherStarts,
+        otherEnds,
+        allSpend,
+        allReach,
+        allResults,
+        allMsgConv,
+        allClicks,
+        '',            // CTR — เว้นว่าง
+        '',            // CPC — เว้นว่าง
+        allMql,
+        allLead,
+        allQt,
+        allSales,
+        allRoas
       ]);
     }
 
@@ -425,6 +465,57 @@ function buildRawSumMap_(data, dateColIdx, campColIdx, valueColIdx, startDate, n
     map[mk][camp] = (map[mk][camp] || 0) + val;
   }
   return map;
+}
+
+/**
+ * นับ respond_id แบบไม่ซ้ำ (distinct) "ระดับทั้งเดือน" ไม่แยกตาม campaign
+ * ใช้สำหรับแถว All Campaign — กัน respond_id เดียวกันที่อยู่หลาย campaign ถูกนับซ้ำ
+ * return: { monthKey: count (distinct respond_id) }
+ */
+function buildMonthDistinctMap_(data, dateColIdx, respondIdColIdx, startDate, now) {
+  var map = {};
+  var seen = {};   // seen[mk][respondId] = true
+  if (!data || data.length < 2) return map;
+
+  for (var r = 1; r < data.length; r++) {
+    var row  = data[r];
+    var date = parseDate_(row[dateColIdx]);
+    if (!date || date < startDate || date > now) continue;
+
+    var rid = trimStr_(row[respondIdColIdx]);
+    if (!rid) continue;
+
+    var mk = getMonthKey_(date);
+    if (!seen[mk]) seen[mk] = {};
+    if (seen[mk][rid]) continue;
+    seen[mk][rid] = true;
+
+    map[mk] = (map[mk] || 0) + 1;
+  }
+  return map;
+}
+
+/** รวมค่า field หนึ่งจากทุก campaign ใน bMonthData → ผลรวม (sum); ถ้าไม่มีเลขเลย → '' */
+function sumBField_(bMonthData, field) {
+  var total = 0;
+  var hasVal = false;
+  Object.keys(bMonthData).forEach(function(camp) {
+    var v = Number(bMonthData[camp][field]);
+    if (!isNaN(v)) { total += v; hasVal = true; }
+  });
+  return hasVal ? total : '';
+}
+
+/** รวมค่าทุก value ใน map { camp: number } → ผลรวม (sum); ถ้าว่าง → '' */
+function sumMapValues_(rawMap) {
+  if (!rawMap) return '';
+  var total = 0;
+  var hasVal = false;
+  Object.keys(rawMap).forEach(function(k) {
+    var v = Number(rawMap[k]);
+    if (!isNaN(v)) { total += v; hasVal = true; }
+  });
+  return hasVal ? total : '';
 }
 
 /* ===================== DISTRIBUTE TO OTHER ===================== */
