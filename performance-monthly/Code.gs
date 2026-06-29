@@ -92,8 +92,8 @@ var OUTPUT_HEADER = [
   'QT (Value)',                      // N
   'Sales',                           // O
   'ROAS',                            // P
-  'CPO1',                            // Q  = Amount spent ÷ respond_id distinct ใน Quotation (D)
-  'CPO2'                             // R  = Amount spent ÷ respond_id distinct ใน Invoice (E)
+  'CPO-QT',                          // Q  = Amount spent ÷ respond_id distinct ใน Quotation (D)
+  'CPO-INV'                          // R  = Amount spent ÷ respond_id distinct ใน Invoice (E)
 ];
 
 /* ===================== MENU ===================== */
