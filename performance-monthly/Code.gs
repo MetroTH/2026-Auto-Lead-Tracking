@@ -91,7 +91,9 @@ var OUTPUT_HEADER = [
   'Lead',                            // M
   'QT (Value)',                      // N
   'Sales',                           // O
-  'ROAS'                             // P
+  'ROAS',                            // P
+  'CPO1',                            // Q  = Amount spent ÷ respond_id distinct ใน Quotation (D)
+  'CPO2'                             // R  = Amount spent ÷ respond_id distinct ใน Invoice (E)
 ];
 
 /* ===================== MENU ===================== */
@@ -166,11 +168,14 @@ function buildPerformance_(opts) {
     var leadRaw  = buildRawCountMap_(dataD, CONFIG.D_DATE, CONFIG.D_CAMPAIGN_NAME, CONFIG.D_RESPOND_ID, startDate, now);
     var qtRaw    = buildRawSumMap_(dataD, CONFIG.D_DATE, CONFIG.D_CAMPAIGN_NAME, CONFIG.D_VALUE, startDate, now);
     var salesRaw = buildRawSumMap_(dataE, CONFIG.E_DATE, CONFIG.E_CAMPAIGN_NAME, CONFIG.E_TOTAL_SALES, startDate, now);
+    // นับ respond_id distinct จาก Invoice (E) ต่อ month+campaign — ใช้เป็นตัวหารของ CPO2
+    var invCountRaw = buildRawCountMap_(dataE, CONFIG.E_DATE, CONFIG.E_CAMPAIGN_NAME, CONFIG.E_RESPOND_ID, startDate, now);
 
     // นับ respond_id แบบไม่ซ้ำ "ระดับทั้งเดือน" (ไม่แยก campaign) — ใช้สำหรับแถว All Campaign
     // ต้องนับแยกต่างหาก เพราะ respond_id เดียวกันอาจอยู่หลาย campaign ถ้าเอาแต่ละ campaign มาบวกจะเกินจริง
     var mqlMonthDistinct  = buildMonthDistinctMap_(dataA, CONFIG.A_CONTACT_DATE, CONFIG.A_RESPOND_ID, startDate, now);
     var leadMonthDistinct = buildMonthDistinctMap_(dataD, CONFIG.D_DATE, CONFIG.D_RESPOND_ID, startDate, now);
+    var invMonthDistinct  = buildMonthDistinctMap_(dataE, CONFIG.E_DATE, CONFIG.E_RESPOND_ID, startDate, now);
 
     // รวบรวม Month Keys ทั้งหมดจากทุก Source
     var allMonthSet = {};
@@ -212,6 +217,7 @@ function buildPerformance_(opts) {
       var leadDist  = distributeToOther_(leadRaw[mk]  || {}, bCampaigns);
       var qtDist    = distributeToOther_(qtRaw[mk]    || {}, bCampaigns);
       var salesDist = distributeToOther_(salesRaw[mk] || {}, bCampaigns);
+      var invDist   = distributeToOther_(invCountRaw[mk] || {}, bCampaigns);   // respond_id distinct จาก Invoice (E)
 
       // Rows สำหรับ Campaign แต่ละตัวจาก B
       for (var ci = 0; ci < bCampaigns.length; ci++) {
@@ -221,6 +227,17 @@ function buildPerformance_(opts) {
         var spendVal = b.spend !== '' && b.spend !== null && b.spend !== undefined ? b.spend : '';
         var roas = (salesVal !== '' && spendVal !== '' && spendVal !== 0)
           ? Math.round((salesVal / spendVal) * 100) / 100
+          : '';
+
+        // CPO1 = cost ÷ respond_id distinct ใน Quotation (D) = Spend ÷ Lead(M)
+        // CPO2 = cost ÷ respond_id distinct ใน Invoice (E)
+        var leadVal = leadDist[camp] !== undefined ? leadDist[camp] : '';
+        var invVal  = invDist[camp]  !== undefined ? invDist[camp]  : '';
+        var cpo1 = (spendVal !== '' && spendVal !== 0 && leadVal !== '' && leadVal !== 0)
+          ? Math.round((spendVal / leadVal) * 100) / 100
+          : '';
+        var cpo2 = (spendVal !== '' && spendVal !== 0 && invVal !== '' && invVal !== 0)
+          ? Math.round((spendVal / invVal) * 100) / 100
           : '';
 
         outputRows.push([
@@ -236,10 +253,12 @@ function buildPerformance_(opts) {
           b.ctr      !== undefined ? b.ctr      : '',
           b.cpc      !== undefined ? b.cpc      : '',
           mqlDist[camp]  !== undefined ? mqlDist[camp]  : '',
-          leadDist[camp] !== undefined ? leadDist[camp] : '',
+          leadVal,
           qtDist[camp]   !== undefined ? qtDist[camp]   : '',
           salesVal,
-          roas
+          roas,
+          cpo1,
+          cpo2
         ]);
       }
 
@@ -267,7 +286,9 @@ function buildPerformance_(opts) {
         otherLead,
         otherQt,
         otherSales,
-        ''
+        '',      // ROAS — Other ไม่มี Spend
+        '',      // CPO1 — Other ไม่มี Spend
+        ''       // CPO2 — Other ไม่มี Spend
       ]);
 
       // Row "All Campaign" — ยอดรวมทั้งเดือน (ทุก Campaign + Other)
@@ -284,6 +305,14 @@ function buildPerformance_(opts) {
       var allSales   = sumMapValues_(salesRaw[mk]);
       var allRoas    = (allSales !== '' && allSpend !== '' && allSpend !== 0)
         ? Math.round((allSales / allSpend) * 100) / 100
+        : '';
+      // CPO1/CPO2 ระดับทั้งเดือน = Spend รวม ÷ respond_id distinct ระดับเดือน (D / E)
+      var allInv     = invMonthDistinct[mk]  !== undefined ? invMonthDistinct[mk]  : '';
+      var allCpo1    = (allSpend !== '' && allSpend !== 0 && allLead !== '' && allLead !== 0)
+        ? Math.round((allSpend / allLead) * 100) / 100
+        : '';
+      var allCpo2    = (allSpend !== '' && allSpend !== 0 && allInv !== '' && allInv !== 0)
+        ? Math.round((allSpend / allInv) * 100) / 100
         : '';
 
       outputRows.push([
@@ -302,7 +331,9 @@ function buildPerformance_(opts) {
         allLead,
         allQt,
         allSales,
-        allRoas
+        allRoas,
+        allCpo1,
+        allCpo2
       ]);
     }
 
@@ -557,8 +588,8 @@ function writeOutputFull_(outSheet, outputRows) {
   outSheet.getRange(2, 1, outputRows.length, 1).setNumberFormat('@');
   outSheet.getRange(2, 3, outputRows.length, 2).setNumberFormat('@');
   outSheet.getRange(2, 1, outputRows.length, OUTPUT_HEADER.length).setValues(outputRows);
-  // Format ROAS column P (index 15) as number 2 decimal
-  outSheet.getRange(2, 16, outputRows.length, 1).setNumberFormat('0.00');
+  // Format ROAS(P)/CPO1(Q)/CPO2(R) columns 16–18 as number 2 decimal
+  outSheet.getRange(2, 16, outputRows.length, 3).setNumberFormat('0.00');
 }
 
 function appendOutput_(outSheet, outputRows) {
@@ -574,7 +605,7 @@ function appendOutput_(outSheet, outputRows) {
   outSheet.getRange(startRow, 1, outputRows.length, 1).setNumberFormat('@');
   outSheet.getRange(startRow, 3, outputRows.length, 2).setNumberFormat('@');
   outSheet.getRange(startRow, 1, outputRows.length, OUTPUT_HEADER.length).setValues(outputRows);
-  outSheet.getRange(startRow, 16, outputRows.length, 1).setNumberFormat('0.00');
+  outSheet.getRange(startRow, 16, outputRows.length, 3).setNumberFormat('0.00');
 }
 
 /**
