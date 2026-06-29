@@ -14,6 +14,7 @@ Monorepo รวม Google Apps Script ทั้งหมดสำหรับร
 | `invoicehead-detail-bi/` | Invoicehead-Detail-Bi | Sync Invoice จาก Raw-data + CRM |
 | `leadcrm-google-sheet/` | Leadcrm-google-sheet | Sync Quotation + CRM เข้า Google Sheet |
 | `meta-ads-sheets/` | Meta-Ads-Sheets | ดึง Meta Ads Insights เข้า Google Sheet ผ่าน Graph API |
+| `performance-monthly/` | Auto-Lead-Tracking-Performance | รวม Source A–E เป็น Dashboard Performance รายเดือน แยกตาม Campaign |
 
 แต่ละโฟลเดอร์มี `CLAUDE.md` อธิบายรายละเอียดของโปรเจกต์นั้นๆ แยกกัน
 
@@ -36,6 +37,7 @@ Monorepo รวม Google Apps Script ทั้งหมดสำหรับร
 | `leadcrm-google-sheet/` | Quotation Detail-Bi | `14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec` |
 | `invoicehead-detail-bi/` | Invoicehead-Detail-Bi | `1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk` |
 | `meta-ads-sheets/` | FBCampaignADS_Part | (Active Spreadsheet — ไม่มี File ID แยก) |
+| `performance-monthly/` | Auto-Lead-Tracking-Performance | `1GHdmsaWElEgJdbmtAkawV0g9qtQjIgOYcpKwVp-MyeU` |
 
 ### Sheet Names ในแต่ละไฟล์
 
@@ -54,8 +56,11 @@ Monorepo รวม Google Apps Script ทั้งหมดสำหรับร
 - `Raw-data` — ข้อมูล Invoice ดิบ
 - `Invoice` — output ของ `invoicehead-detail-bi/`
 
-**FBCampaignADS_Part** (Active Spreadsheet ของ meta-ads-sheets)
-- `Campaign_Monthly` — output ของ `meta-ads-sheets/`
+**FBCampaignADS_Part** (`1-wZGx8...` — Source B ของ performance-monthly)
+- `Campaign_Monthly` — output ของ `meta-ads-sheets/` (รองรับชื่อแท็บ `FBCampaignADS_Part` / `FBADS` / `Campaign_Monthly`)
+
+**Auto-Lead-Tracking-Performance** (`1GHdmsa...`)
+- `Performance` — output ของ `performance-monthly/` (Dashboard รายเดือน คอลัมน์ A–R)
 
 ---
 
@@ -63,17 +68,25 @@ Monorepo รวม Google Apps Script ทั้งหมดสำหรับร
 
 ```
 DB01 (Facebook Ads — Raw-data)
-  └─► db-from-respond-crm ──► Filter-raw-respond (DB_From_Respond_CRM)
-                                      │
-                     ┌────────────────┴────────────────┐
-                     ▼                                 ▼
-            leadcrm-google-sheet            invoicehead-detail-bi
-            (Quotation Detail-Bi)           (Invoicehead-Detail-Bi)
-
-Meta Graph API ──► meta-ads-sheets ──► FBCampaignADS_Part
+  └─► db-from-respond-crm ──► Filter-raw-respond (DB_From_Respond_CRM) ─────┐ (A)
+                                      │                                      │
+                     ┌────────────────┴────────────────┐                    │
+                     ▼                                 ▼                     │
+            leadcrm-google-sheet            invoicehead-detail-bi           │
+            (Quotation Detail-Bi)           (Invoicehead-Detail-Bi)         │
+                     │ (D)                          │ (E)                    │
+Meta Graph API ──► meta-ads-sheets ──► FBCampaignADS_Part (B)               │
+                     │                              │                       │
+                     └──────────────┬───────────────┴───────────────────────┘
+                                    ▼
+                          performance-monthly  ──►  Auto-Lead-Tracking-Performance
+                          (รวม A,B,D,E → Sheet "Performance" รายเดือน × Campaign)
 ```
 
-> **หมายเหตุ:** `db-from-respond-crm` ต้องรันก่อนเสมอ เพราะ `leadcrm-google-sheet` และ `invoicehead-detail-bi` ดึง `Filter-raw-respond` ที่เป็น output ของมัน
+> **หมายเหตุลำดับการรัน:**
+> 1. `db-from-respond-crm` ต้องรันก่อนเสมอ เพราะ `leadcrm-google-sheet` และ `invoicehead-detail-bi` ดึง `Filter-raw-respond` ที่เป็น output ของมัน
+> 2. `performance-monthly` ต้องรัน **สุดท้าย** เพราะดึง Source A (Filter-raw-respond), B (FBCampaignADS_Part), D (Quotation), E (Invoice) มารวมกัน
+> 3. เวลา Trigger เรียงให้ข้อมูลไหลทันในวันเดียว: A 17:30 → B/D/E 17:40 → F (performance-monthly) 18:00
 
 ---
 
