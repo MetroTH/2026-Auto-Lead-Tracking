@@ -7,9 +7,14 @@
  */
 
 // ====== CONFIG ======
-var QUOTATION_FILE_ID = '14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec';
+var QUOTATION_FILE_ID = '14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec';  // ไฟล์ output (เขียนแทป Quotation)
 var CRM_FILE_ID       = '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk';
 var CAMPAIGN_FILE_ID  = '19yN662iCppjMFJTONgZHpbQH4gOkUtDxUcvqYZyPcKw'; // DB01 Facebook Ads
+
+// แหล่ง Raw quotation — ไฟล์กลาง Master Sales (paste ครั้งเดียว หลายโปรเจคอ่านร่วมกัน)
+//   ถ้าตั้ง id ไว้ = อ่านจากไฟล์กลาง · ถ้าเว้นว่าง ('') = ใช้แทป Raw-data ในไฟล์ output เดิม
+var RAW_SRC_FILE_ID = '1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M';
+var RAW_SRC_SHEET   = 'Raw Quotation';
 
 var RAWDATA_SHEET   = 'Raw-data';
 var QUOTATION_SHEET = 'Quotation';
@@ -90,12 +95,15 @@ function syncQuotation_(fullSync) {
   }
   try {
     var quoSS    = SpreadsheetApp.openById(QUOTATION_FILE_ID);
-    var rawSheet = quoSS.getSheetByName(RAWDATA_SHEET);
+    // อ่าน Raw จากไฟล์กลาง (RAW_SRC_FILE_ID) ถ้าตั้งไว้ / ไม่งั้นใช้แทป Raw-data ในไฟล์เดิม
+    var rawSheet = RAW_SRC_FILE_ID
+      ? SpreadsheetApp.openById(RAW_SRC_FILE_ID).getSheetByName(RAW_SRC_SHEET)
+      : quoSS.getSheetByName(RAWDATA_SHEET);
     var dstSheet = quoSS.getSheetByName(QUOTATION_SHEET);
     var crmSheet = SpreadsheetApp.openById(CRM_FILE_ID).getSheetByName(CRM_SHEET);
 
     if (!rawSheet || !dstSheet || !crmSheet) {
-      throw new Error('หาชีตไม่เจอ: ตรวจชื่อชีต Raw-data / Quotation / Filter-raw-respond');
+      throw new Error('หาชีตไม่เจอ: ตรวจชื่อแทป Raw ("' + (RAW_SRC_FILE_ID ? RAW_SRC_SHEET : RAWDATA_SHEET) + '") / Quotation / Filter-raw-respond');
     }
 
     if (fullSync) {

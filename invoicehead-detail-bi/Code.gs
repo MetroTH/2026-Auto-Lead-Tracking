@@ -7,8 +7,13 @@
  */
 
 // ====== CONFIG ======
-var INVOICE_FILE_ID = '1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk';
+var INVOICE_FILE_ID = '1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk';  // ไฟล์ output (เขียนแทป Invoice)
 var CRM_FILE_ID     = '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk';
+
+// แหล่ง Raw invoice — ไฟล์กลาง Master Sales (paste ครั้งเดียว หลายโปรเจคอ่านร่วมกัน)
+//   ถ้าตั้ง id ไว้ = อ่านจากไฟล์กลาง · ถ้าเว้นว่าง ('') = ใช้แทป Raw-data ในไฟล์ output เดิม
+var RAW_SRC_FILE_ID = '1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M';
+var RAW_SRC_SHEET   = 'Raw Invoice';
 
 var RAWDATA_SHEET = 'Raw-data';
 var INVOICE_SHEET = 'Invoice';
@@ -92,12 +97,15 @@ function syncInvoice_(fullSync) {
   }
   try {
     var invSS    = SpreadsheetApp.openById(INVOICE_FILE_ID);
-    var rawSheet = invSS.getSheetByName(RAWDATA_SHEET);
+    // อ่าน Raw จากไฟล์กลาง (RAW_SRC_FILE_ID) ถ้าตั้งไว้ / ไม่งั้นใช้แทป Raw-data ในไฟล์เดิม
+    var rawSheet = RAW_SRC_FILE_ID
+      ? SpreadsheetApp.openById(RAW_SRC_FILE_ID).getSheetByName(RAW_SRC_SHEET)
+      : invSS.getSheetByName(RAWDATA_SHEET);
     var dstSheet = invSS.getSheetByName(INVOICE_SHEET);
     var crmSheet = SpreadsheetApp.openById(CRM_FILE_ID).getSheetByName(CRM_SHEET);
 
     if (!rawSheet || !dstSheet || !crmSheet) {
-      throw new Error('หาชีตไม่เจอ: ตรวจชื่อชีต Raw-data / Invoice / Filter-raw-respond');
+      throw new Error('หาชีตไม่เจอ: ตรวจชื่อแทป Raw ("' + (RAW_SRC_FILE_ID ? RAW_SRC_SHEET : RAWDATA_SHEET) + '") / Invoice / Filter-raw-respond');
     }
 
     if (fullSync) {
