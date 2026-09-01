@@ -188,7 +188,7 @@ function buildFilter_(opts) {
   }
 
   const adsMap = loadAdsMap_();
-  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+  const MATCH_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;   // ช่วงจับคู่ Ad ↔ lead: ไม่เกิน 30 วัน
   const output = Object.keys(latestByRespond)
     .map(function (k) {
       const row = latestByRespond[k];
@@ -200,7 +200,7 @@ function buildFilter_(opts) {
       let bestDiff = Infinity;
       for (let i = 0; i < candidates.length; i++) {
         const diff = taskDate - candidates[i]._tsDate;
-        if (diff >= 0 && diff <= SEVEN_DAYS_MS && diff < bestDiff) {
+        if (diff >= 0 && diff <= MATCH_WINDOW_MS && diff < bestDiff) {
           bestDiff = diff;
           bestAd = candidates[i];
         }
