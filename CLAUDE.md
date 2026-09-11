@@ -86,7 +86,11 @@ Meta Graph API ──► meta-ads-sheets ──► FBCampaignADS_Part (B)       
 > **หมายเหตุลำดับการรัน:**
 > 1. `db-from-respond-crm` ต้องรันก่อนเสมอ เพราะ `leadcrm-google-sheet` และ `invoicehead-detail-bi` ดึง `Filter-raw-respond` ที่เป็น output ของมัน
 > 2. `performance-monthly` ต้องรัน **สุดท้าย** เพราะดึง Source A (Filter-raw-respond), B (FBCampaignADS_Part), D (Quotation), E (Invoice) มารวมกัน
-> 3. เวลา Trigger เรียงให้ข้อมูลไหลทันในวันเดียว: A 17:30 → B/D/E 17:40 → F (performance-monthly) 18:00
+> 3. เวลา Trigger เรียงให้ข้อมูลไหลทันในวันเดียว (อัปเดต 2026-09-11):
+>    A `db-from-respond-crm` 17:30 → B `meta-ads-sheets` 17:40 · D `leadcrm` + E `invoicehead` 17:45
+>    → F `performance-monthly` 18:15 (รันสุดท้าย)
+>    - หมายเหตุ: Metro Sync (รีโป Enhance_CustomerApp) 17:45 และ Loyalty (รีโป Loyalty-Point) 18:15
+>      เป็นสายข้ามรีโป — Loyalty รอ Metro Sync สร้าง DB02 Filter ก่อน
 
 ---
 
