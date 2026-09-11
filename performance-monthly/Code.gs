@@ -103,7 +103,7 @@ function onOpen() {
     .addItem('โหมด 1: ดึงทั้งหมด (ตั้งแต่ ม.ค. 69)', 'runMode1_Full')
     .addItem('โหมด 2: ดึงเพิ่ม (Manual incremental)', 'runMode2_Incremental')
     .addSeparator()
-    .addItem('ตั้ง Trigger รายวัน 18:00', 'installDailyTrigger')
+    .addItem('ตั้ง Trigger รายวัน 18:15', 'installDailyTrigger')
     .addItem('ลบ Trigger รายวัน', 'removeDailyTrigger')
     .addToUi();
 }
