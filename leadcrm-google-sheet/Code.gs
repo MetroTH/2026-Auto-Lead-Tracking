@@ -3,7 +3,7 @@
  *
  * โหมด 1 – Full Sync    : ล้างชีตแล้ว sync ทั้งหมดใหม่
  * โหมด 2 – Manual Sync  : เพิ่มเฉพาะแถวใหม่ที่ยังไม่มี (ไม่ซ้ำ)
- * โหมด 3 – Trigger      : รันอัตโนมัติทุกวัน 17:40 Asia/Bangkok (= โหมด 2)
+ * โหมด 3 – Trigger      : รันอัตโนมัติทุกวัน 17:45 Asia/Bangkok (= โหมด 2)
  */
 
 // ====== CONFIG ======
@@ -11,7 +11,7 @@ var QUOTATION_FILE_ID = '14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec';  // ไ�
 var CRM_FILE_ID       = '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk';
 var CAMPAIGN_FILE_ID  = '19yN662iCppjMFJTONgZHpbQH4gOkUtDxUcvqYZyPcKw'; // DB01 Facebook Ads
 
-// แหล่ง Raw quotation — ไฟล์กลาง Master Sales (paste ครั้งเดียว หลายโปรเจคอ่านร่วมกัน)
+// แหล่ง Raw quotation — ไฟล์ Master Sale-raw quotation (แทป Raw Quotation)
 //   ถ้าตั้ง id ไว้ = อ่านจากไฟล์กลาง · ถ้าเว้นว่าง ('') = ใช้แทป Raw-data ในไฟล์ output เดิม
 var RAW_SRC_FILE_ID = '1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M';
 var RAW_SRC_SHEET   = 'Raw Quotation';
@@ -56,7 +56,7 @@ function onOpen() {
     .addItem('🔄 โหมด 1: Full Sync (ดึงทั้งหมดใหม่)', 'runFullSync')
     .addItem('➕ โหมด 2: Manual Sync (เพิ่มเฉพาะใหม่)', 'runManualSync')
     .addSeparator()
-    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:40', 'createDailyTrigger')
+    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:45', 'createDailyTrigger')
     .addItem('🗑️ ลบ Trigger ทั้งหมด', 'removeAllTriggers')
     .addToUi();
 }
@@ -375,10 +375,10 @@ function createDailyTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(17)
-    .nearMinute(40)
+    .nearMinute(45)
     .create();
-  Logger.log('ตั้ง trigger รายวัน 17:40 (Asia/Bangkok) เรียบร้อย');
-  showToast_('ตั้ง Trigger อัตโนมัติ 17:40 น. เรียบร้อยแล้ว');
+  Logger.log('ตั้ง trigger รายวัน 17:45 (Asia/Bangkok) เรียบร้อย');
+  showToast_('ตั้ง Trigger อัตโนมัติ 17:45 น. เรียบร้อยแล้ว');
 }
 
 function removeAllTriggers() {

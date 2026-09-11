@@ -17,6 +17,9 @@
 
 ## ⚠️ ไฟล์กลาง Master Sales
 
-`invoicehead-detail-bi` และ `leadcrm-google-sheet` ดึง raw จากไฟล์กลาง **Master Sales** ด้วย id
-(แทป `Raw Invoice` / `Raw Quotation`) — **ก่อนวางข้อมูลอ่าน [`MASTER-SALES-GUIDE.md`](MASTER-SALES-GUIDE.md) ก่อนทุกครั้ง**
+ดึง raw จากไฟล์กลาง (แยกเป็น 2 ไฟล์แล้ว เพราะชนลิมิตเซลล์):
+- `leadcrm-google-sheet` → **Master Sale-raw quotation** `1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M` (แทป `Raw Quotation`)
+- `invoicehead-detail-bi` → **Master Sales-raw invoice** `1IQNdDeBBcPyNpXJi-jnWrIf3d4y-xGozydYryQiHzzw` (แทป `Raw Invoice`)
+
+**ก่อนวางข้อมูลอ่าน [`MASTER-SALES-GUIDE.md`](MASTER-SALES-GUIDE.md) ก่อนทุกครั้ง**
 (ห้ามสลับคอลัมน์ / เปลี่ยนชื่อหัว / เปลี่ยนชื่อแทป)

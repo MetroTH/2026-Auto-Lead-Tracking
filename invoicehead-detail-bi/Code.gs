@@ -3,16 +3,16 @@
  *
  * โหมด 1 – Full Sync    : ล้างชีตแล้ว sync ทั้งหมดใหม่
  * โหมด 2 – Manual Sync  : เพิ่มเฉพาะแถวใหม่ที่ยังไม่มี (ไม่ซ้ำ)
- * โหมด 3 – Trigger      : รันอัตโนมัติทุกวัน 17:40 Asia/Bangkok (= โหมด 2)
+ * โหมด 3 – Trigger      : รันอัตโนมัติทุกวัน 17:45 Asia/Bangkok (= โหมด 2)
  */
 
 // ====== CONFIG ======
 var INVOICE_FILE_ID = '1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk';  // ไฟล์ output (เขียนแทป Invoice)
 var CRM_FILE_ID     = '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk';
 
-// แหล่ง Raw invoice — ไฟล์กลาง Master Sales (paste ครั้งเดียว หลายโปรเจคอ่านร่วมกัน)
+// แหล่ง Raw invoice — ไฟล์ Master Sales-raw invoice (แยกไฟล์ออกมาแล้ว เพื่อเลี่ยง limit เซลล์)
 //   ถ้าตั้ง id ไว้ = อ่านจากไฟล์กลาง · ถ้าเว้นว่าง ('') = ใช้แทป Raw-data ในไฟล์ output เดิม
-var RAW_SRC_FILE_ID = '1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M';
+var RAW_SRC_FILE_ID = '1IQNdDeBBcPyNpXJi-jnWrIf3d4y-xGozydYryQiHzzw';
 var RAW_SRC_SHEET   = 'Raw Invoice';
 
 var RAWDATA_SHEET = 'Raw-data';
@@ -61,7 +61,7 @@ function onOpen() {
     .addItem('🔄 โหมด 1: Full Sync (ดึงทั้งหมดใหม่)', 'runFullSync')
     .addItem('➕ โหมด 2: Manual Sync (เพิ่มเฉพาะใหม่)', 'runManualSync')
     .addSeparator()
-    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:40', 'createDailyTrigger')
+    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:45', 'createDailyTrigger')
     .addItem('🗑️ ลบ Trigger ทั้งหมด', 'removeAllTriggers')
     .addToUi();
 }
@@ -337,10 +337,10 @@ function createDailyTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(17)
-    .nearMinute(40)
+    .nearMinute(45)
     .create();
-  Logger.log('ตั้ง trigger รายวัน 17:40 เรียบร้อย');
-  showToast_('ตั้ง Trigger อัตโนมัติ 17:40 น. เรียบร้อยแล้ว');
+  Logger.log('ตั้ง trigger รายวัน 17:45 เรียบร้อย');
+  showToast_('ตั้ง Trigger อัตโนมัติ 17:45 น. เรียบร้อยแล้ว');
 }
 
 function removeAllTriggers() {

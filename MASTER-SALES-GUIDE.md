@@ -1,13 +1,18 @@
 # คู่มือไฟล์กลาง "Master Sales" — วิธีวางข้อมูล (สำคัญมาก)
 
-ไฟล์กลาง **Master Sales** (id `1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M`)
-เป็น **แหล่ง raw กลางแหล่งเดียว** ที่หลายโปรเจกต์ดึงไปใช้ด้วย id — วางที่เดียว ทุกโปรเจกต์ได้หมด
-ไม่ต้องวางทับทีละไฟล์
+> **อัปเดต: แยกเป็น 2 ไฟล์แล้ว** (เดิมรวม 2 แทปในไฟล์เดียว แต่ชนลิมิตจำนวนเซลล์ของ Google Sheet
+> จึงแยก `Raw Invoice` ออกไปไว้อีกไฟล์)
 
-| แทป | ใครดึงไปใช้ |
-|---|---|
-| `Raw Invoice` | `invoicehead-detail-bi` (โปรเจกต์นี้) + **Loyalty-Point** |
-| `Raw Quotation` | `leadcrm-google-sheet` (โปรเจกต์นี้) |
+| ไฟล์ | File ID | แทป | ใครดึงไปใช้ |
+|---|---|---|---|
+| **Master Sale-raw quotation** | `1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M` | `Raw Quotation` | `leadcrm-google-sheet` (โปรเจกต์นี้) |
+| **Master Sales-raw invoice** | `1IQNdDeBBcPyNpXJi-jnWrIf3d4y-xGozydYryQiHzzw` | `Raw Invoice` | `invoicehead-detail-bi` (โปรเจกต์นี้) + **Loyalty-Point** |
+
+> ⚠️ **Loyalty-Point** ก็ต้องเปลี่ยนให้ชี้ไฟล์ `Master Sales-raw invoice` ใหม่ด้วย
+> (ดู `Loyalty-Point/apps-script/Dashboard.gs` → `SRC.invoice.id`) ไม่งั้นจะยังอ่านจากไฟล์เดิม
+>
+> วางข้อมูล: `Raw Quotation` วางในไฟล์ quotation, `Raw Invoice` วางในไฟล์ invoice —
+> วางแยกไฟล์แต่กฎการวาง (ห้ามสลับคอลัมน์/เปลี่ยนหัว/เปลี่ยนชื่อแทป) เหมือนเดิมทุกข้อ
 
 ---
 
