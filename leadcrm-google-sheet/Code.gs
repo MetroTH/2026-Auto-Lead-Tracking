@@ -3,7 +3,7 @@
  *
  * โหมด 1 – Full Sync    : ล้างชีตแล้ว sync ทั้งหมดใหม่
  * โหมด 2 – Manual Sync  : เพิ่มเฉพาะแถวใหม่ที่ยังไม่มี (ไม่ซ้ำ)
- * โหมด 3 – Trigger      : รันอัตโนมัติทุกวัน 17:40 Asia/Bangkok (= โหมด 2)
+ * โหมด 3 – Trigger      : รันอัตโนมัติทุกวัน 17:45 Asia/Bangkok (= โหมด 2)
  */
 
 // ====== CONFIG ======
@@ -56,7 +56,7 @@ function onOpen() {
     .addItem('🔄 โหมด 1: Full Sync (ดึงทั้งหมดใหม่)', 'runFullSync')
     .addItem('➕ โหมด 2: Manual Sync (เพิ่มเฉพาะใหม่)', 'runManualSync')
     .addSeparator()
-    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:40', 'createDailyTrigger')
+    .addItem('⏰ โหมด 3: ตั้ง Trigger อัตโนมัติ 17:45', 'createDailyTrigger')
     .addItem('🗑️ ลบ Trigger ทั้งหมด', 'removeAllTriggers')
     .addToUi();
 }
@@ -375,10 +375,10 @@ function createDailyTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(17)
-    .nearMinute(40)
+    .nearMinute(45)
     .create();
-  Logger.log('ตั้ง trigger รายวัน 17:40 (Asia/Bangkok) เรียบร้อย');
-  showToast_('ตั้ง Trigger อัตโนมัติ 17:40 น. เรียบร้อยแล้ว');
+  Logger.log('ตั้ง trigger รายวัน 17:45 (Asia/Bangkok) เรียบร้อย');
+  showToast_('ตั้ง Trigger อัตโนมัติ 17:45 น. เรียบร้อยแล้ว');
 }
 
 function removeAllTriggers() {

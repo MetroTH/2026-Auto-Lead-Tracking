@@ -751,9 +751,10 @@ function installDailyTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(CONFIG.TRIGGER_HOUR)
+    .nearMinute(15)
     .inTimezone(CONFIG.TIMEZONE)
     .create();
-  notify_('ตั้ง Trigger สำเร็จ', 'ดึงข้อมูล Performance ทุกวัน เวลา ' + CONFIG.TRIGGER_HOUR + ':00 (' + CONFIG.TIMEZONE + ')');
+  notify_('ตั้ง Trigger สำเร็จ', 'ดึงข้อมูล Performance ทุกวัน เวลา ' + CONFIG.TRIGGER_HOUR + ':15 (' + CONFIG.TIMEZONE + ')');
 }
 
 function removeDailyTrigger() {
