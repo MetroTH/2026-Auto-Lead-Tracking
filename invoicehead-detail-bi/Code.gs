@@ -10,9 +10,9 @@
 var INVOICE_FILE_ID = '1etfpucdZ66EixB_TPZNIUjd7nprnSB0myo_VCxWk_yk';  // ไฟล์ output (เขียนแทป Invoice)
 var CRM_FILE_ID     = '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk';
 
-// แหล่ง Raw invoice — ไฟล์กลาง Master Sales (paste ครั้งเดียว หลายโปรเจคอ่านร่วมกัน)
+// แหล่ง Raw invoice — ไฟล์ Master Sales-raw invoice (แยกไฟล์ออกมาแล้ว เพื่อเลี่ยง limit เซลล์)
 //   ถ้าตั้ง id ไว้ = อ่านจากไฟล์กลาง · ถ้าเว้นว่าง ('') = ใช้แทป Raw-data ในไฟล์ output เดิม
-var RAW_SRC_FILE_ID = '1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M';
+var RAW_SRC_FILE_ID = '1IQNdDeBBcPyNpXJi-jnWrIf3d4y-xGozydYryQiHzzw';
 var RAW_SRC_SHEET   = 'Raw Invoice';
 
 var RAWDATA_SHEET = 'Raw-data';

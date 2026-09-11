@@ -11,7 +11,7 @@ var QUOTATION_FILE_ID = '14stvnZSD-WNp1N_bI-aEdJDb4IHplRkFiVh5WWwRwec';  // ไ�
 var CRM_FILE_ID       = '1Fq_Suvh1u-iTLzbIoyowiuXEHcKK1VtayDab2qO4Bwk';
 var CAMPAIGN_FILE_ID  = '19yN662iCppjMFJTONgZHpbQH4gOkUtDxUcvqYZyPcKw'; // DB01 Facebook Ads
 
-// แหล่ง Raw quotation — ไฟล์กลาง Master Sales (paste ครั้งเดียว หลายโปรเจคอ่านร่วมกัน)
+// แหล่ง Raw quotation — ไฟล์ Master Sale-raw quotation (แทป Raw Quotation)
 //   ถ้าตั้ง id ไว้ = อ่านจากไฟล์กลาง · ถ้าเว้นว่าง ('') = ใช้แทป Raw-data ในไฟล์ output เดิม
 var RAW_SRC_FILE_ID = '1g6E1TzJLNOhTE7BBZMGHAqBiHl-qwg9Aka2PdJ0hf2M';
 var RAW_SRC_SHEET   = 'Raw Quotation';
